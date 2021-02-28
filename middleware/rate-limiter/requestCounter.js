@@ -28,3 +28,5 @@ class RequestCounter {
     });
   }
 }
+
+module.exports = RequestCounter;
