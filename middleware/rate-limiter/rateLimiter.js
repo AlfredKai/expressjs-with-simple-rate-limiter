@@ -1,5 +1,5 @@
 const rateLimit = (maxReqCount, reqCounter) => {
-  if (!reqCounter) throw new Error('No valid request counter.');
+  if (!reqCounter) throw new Error('No valid RequestCounter');
   return (req, res, next) => {
     reqCounter
       .add(req.ip) // suppose there is no proxy ahead
