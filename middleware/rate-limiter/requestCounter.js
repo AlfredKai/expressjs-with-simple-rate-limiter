@@ -1,6 +1,13 @@
 const redis = require('redis');
 
+/**
+ * Storage of request count implemented using redis.
+ */
 class RequestCounter {
+  /**
+   * 
+   * @param {number} TTL window in seconds. 
+   */
   constructor(window) {
     this.window = window;
     this.redisClient = redis.createClient();
@@ -9,6 +16,11 @@ class RequestCounter {
     });
   }
 
+  /**
+   * 
+   * @param {string} key 
+   * @return {Promise<number>} resolve current count within TTL.
+   */
   add(key) {
     const self = this;
     return new Promise((resolve, reject) => {
