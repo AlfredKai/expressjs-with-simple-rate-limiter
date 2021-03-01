@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "start": "nodemon ./bin/www",
-    "test": "mocha"
+    "test": "mocha",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
@@ -15,6 +17,7 @@
     "redis": "^3.0.2"
   },
   "devDependencies": {
+    "cypress": "^6.5.0",
     "mocha": "^8.3.0",
     "nodemon": "^2.0.7",
     "sinon": "^9.2.4"

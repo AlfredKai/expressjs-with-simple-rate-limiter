@@ -3,3 +3,7 @@
 ## Built With
 
 - Express application generator
+- redis
+- mocha
+- sinon
+- Cypress

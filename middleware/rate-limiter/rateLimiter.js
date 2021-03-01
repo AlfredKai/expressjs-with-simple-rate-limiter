@@ -8,7 +8,7 @@ const rateLimit = (maxReqCount, reqCounter) => {
           res.status(429).send('Error');
           return;
         }
-        res.locals.reqCount = count;
+        res.set('Request-Count-In-Window', count)
         next();
       })
       .catch((e) => {
