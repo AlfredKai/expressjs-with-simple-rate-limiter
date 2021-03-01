@@ -17,9 +17,9 @@ Express server with custom rate-limiting middleware implemented using redis.
 
 ## Usage
 
-All routes applied rate-limiting by default(60 requests per minute).
+All routes applied rate-limiting by default (60 requests per minute).
 
-You must have a `redis-server` running on your local with defaults host and port  (127.0.0.1:6379) to start the server.
+**You must have a `redis-server` running on your local with defaults host and port  (127.0.0.1:6379) to start the server.**
 
 Install using yarn:
 
