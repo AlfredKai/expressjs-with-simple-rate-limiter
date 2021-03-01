@@ -1,12 +1,19 @@
 /// <reference types="cypress" />
 
-const window = 1000;
-const reqCountHeaderName = 'request-count-in-window';
 const baseUrl = 'http://localhost:3000';
+const reqCountHeaderName = 'request-count-in-window';
+const flushallUrl = 'test/redis/flushall';
 
 context('Rate-Limiting', { baseUrl }, () => {
-  afterEach(() => {
-    cy.wait(window);
+  beforeEach(() => {
+    cy.request('POST', flushallUrl).should((response) => {
+      expect(response.status).to.eq(200);
+    });
+  });
+  after(() => {
+    cy.request('POST', flushallUrl).should((response) => {
+      expect(response.status).to.eq(200);
+    });
   });
 
   it('should return 429 when exceeding the max and reset after window expire. (max:5, window:1)', () => {
@@ -39,9 +46,6 @@ context('Rate-Limiting', { baseUrl }, () => {
           .to.eq(expectRequestCount);
       });
     });
-
-    // clean up
-    cy.wait(window);
   });
 
   it('should return 429 when exceeding the max and reset after window expire. (max:3, window:2)', () => {
@@ -51,7 +55,9 @@ context('Rate-Limiting', { baseUrl }, () => {
     ['1', '2', '3'].forEach((expectRequestCount) => {
       cy.request(testUrl).should((response) => {
         expect(response.status).to.eq(200);
-        expect(response.headers).property(reqCountHeaderName).to.eq(expectRequestCount);
+        expect(response.headers)
+          .property(reqCountHeaderName)
+          .to.eq(expectRequestCount);
       });
     });
 
@@ -76,7 +82,9 @@ context('Rate-Limiting', { baseUrl }, () => {
     ['1', '2', '3'].forEach((expectRequestCount) => {
       cy.request(testUrl).should((response) => {
         expect(response.status).to.eq(200);
-        expect(response.headers).property(reqCountHeaderName).to.eq(expectRequestCount);
+        expect(response.headers)
+          .property(reqCountHeaderName)
+          .to.eq(expectRequestCount);
       });
     });
 

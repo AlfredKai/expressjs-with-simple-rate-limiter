@@ -13,7 +13,7 @@ const mockRequest = (ip) => ({
 const mockResponse = (onSendCalled) => {
   const res = {};
   res.status = sinon.stub().returns(res);
-  res.locals = sinon.stub().returns(res);
+  res.set = sinon.stub();
   res.send = () => {
     onSendCalled();
   };
@@ -22,34 +22,36 @@ const mockResponse = (onSendCalled) => {
 
 describe('rateLimiter', function () {
   let testCase = [
-    { limit: 2, currentCount: 1 },
-    { limit: 2, currentCount: 2 },
-    { limit: 10, currentCount: 5 },
-    { limit: 10, currentCount: 10 },
+    { max: 2, currentCount: 1 },
+    { max: 2, currentCount: 2 },
+    { max: 10, currentCount: 5 },
+    { max: 10, currentCount: 10 },
   ];
-  testCase.forEach(({ limit, currentCount }) =>
-    it(`should call next() if request count ${currentCount} <= limit ${limit}`, function (done) {
+  testCase.forEach(({ max, currentCount }) =>
+    it(`should call next() and set count in header 'Request-Count-In-Window' if request count ${currentCount} <= max ${max}`, function (done) {
       const nextShouldBeCalled = done;
       const _mockReqCounter = mockReqCounter(currentCount);
-      const middlewareRateLimit = rateLimit(limit, _mockReqCounter);
+      const _mockResponse = mockResponse()
+      const middlewareRateLimit = rateLimit(max, _mockReqCounter);
 
-      middlewareRateLimit(mockRequest('any'), mockResponse(), () => {
+      middlewareRateLimit(mockRequest('any'), _mockResponse, () => {
+        assert.ok(_mockResponse.set.calledWith('Request-Count-In-Window', currentCount))
         nextShouldBeCalled();
       });
     })
   );
 
   testCase = [
-    { limit: 1, currentCount: 2 },
-    { limit: 2, currentCount: 3 },
-    { limit: 10, currentCount: 11 },
-    { limit: 10, currentCount: 15 },
+    { max: 1, currentCount: 2 },
+    { max: 2, currentCount: 3 },
+    { max: 10, currentCount: 11 },
+    { max: 10, currentCount: 15 },
   ];
-  testCase.forEach(({ limit, currentCount }) =>
-    it(`should send error if request count ${currentCount} > limit ${limit}`, function (done) {
+  testCase.forEach(({ max, currentCount }) =>
+    it(`should send error if request count ${currentCount} > max ${max}`, function (done) {
       const nextShouldBeCalled = done;
       const _mockReqCounter = mockReqCounter(currentCount);
-      const middlewareRateLimit = rateLimit(limit, _mockReqCounter);
+      const middlewareRateLimit = rateLimit(max, _mockReqCounter);
 
       middlewareRateLimit(
         mockRequest('any'),
@@ -71,7 +73,7 @@ describe('rateLimiter', function () {
     { ip: '192.168.0.100' },
   ];
   testCase.forEach(({ ip }) =>
-    it(`valid request should call RequestCounter.add() with correct ip (${ip})`, function (done) {
+    it(`should call RequestCounter.add() with correct ip (${ip}) when request is valid`, function (done) {
       const limit = 10;
       const currentCount = 20;
       const nextShouldBeCalled = done;

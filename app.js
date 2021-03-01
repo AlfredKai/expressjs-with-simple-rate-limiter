@@ -33,6 +33,7 @@ const except = function(path, middleware) {
 app.use(except(/\/test\/*/, rateLimiter(60, new RequestCounter(60))));
 
 app.use('/', indexRouter);
+// end-to-end testing routes which should not be exposed
 app.use('/test', testRouter);
 
 // catch 404 and forward to error handler

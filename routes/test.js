@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const redis = require('redis');
 
 const rateLimiter = require('../middleware/rate-limiter/rateLimiter');
 const RequestCounter = require('../middleware/rate-limiter/requestCounter');
@@ -19,5 +20,15 @@ router.get(
     res.send(`Request Count: ${res.getHeader('Request-Count-In-Window')}`);
   }
 );
+
+router.post('/redis/flushall', function (req, res, next) {
+  const redisClient = redis.createClient();
+  redisClient.on('error', function (error) {
+    console.error(error);
+  });
+  redisClient.flushall(() => {
+    res.send('OK');
+  });
+});
 
 module.exports = router;
